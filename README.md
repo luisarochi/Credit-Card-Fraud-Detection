@@ -29,4 +29,6 @@ Para lidiar con el **desbalance de clases**, aplicamos la técnica **SMOTE**, y 
 - Archivo: `creditcard.csv`  
 - Descripción: Transacciones con tarjetas de crédito etiquetadas como **fraude (1)** o **no fraude (0)**.
 
----
+## 📥 Cómo importar los datos
+
+Para evitar subir archivos pesados a GitHub, este proyecto carga el dataset directamente desde Kaggle 
