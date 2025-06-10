@@ -1,19 +1,19 @@
-# mean.py
+import kagglehub
+from kagglehub import KaggleDatasetAdapter
+import pandas as pd
 
-from kagglehub import KaggleDatasetAdapter, load_dataset
-
-# Carga del dataset usando kagglehub
-dataset = load_dataset(
+# Cargar el dataset de Kaggle
+df = kagglehub.load_dataset(
     KaggleDatasetAdapter.PANDAS,
     "mlg-ulb/creditcardfraud",
     "creditcard.csv"
 )
 
-# Selección de la columna 'Amount' (puedes cambiarla si necesitas otra)
-amount_column = dataset["Amount"]
+print(df.head())
+ 
+# Paso 2: Exploración de datos
+print("Información del dataset:")
+print(df.info())
 
-# Cálculo de la media
-mean_amount = amount_column.mean()
-
-# Resultado
-print(f"La media de la columna 'Amount' es: {mean_amount:.2f}")
+print("\nDistribución de la variable objetivo:")
+print(df['Class'].value_counts())
