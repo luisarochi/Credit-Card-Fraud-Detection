@@ -1,14 +1,17 @@
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import pandas as pd
+import joblib
 import numpy as np
+import matplotlib.pyplot as plt
 
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score, 
@@ -108,3 +111,53 @@ print("Reporte de clasificación:\n", classification_report(y_test, y_pred))
 print("Matriz de confusión:\n", confusion_matrix(y_test, y_pred))
 
 print("AUC-ROC:", roc_auc_score(y_test, y_proba))
+
+# Paso 8: Entrenar modelo con datos balanceados y evaluar
+
+# Instanciar el modelo (puedes usar LogisticRegression u otro)
+model = LogisticRegression(random_state=42, max_iter=1000)
+
+# Entrenar con los datos balanceados
+model.fit(X_train_smote, y_train_smote)
+
+# Predecir con el conjunto de prueba original (sin balancear)
+y_pred = model.predict(X_test)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+
+# Evaluar el modelo
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1 Score:", f1_score(y_test, y_pred))
+print("ROC AUC:", roc_auc_score(y_test, y_pred_proba))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+
+# Predicciones en test
+y_pred = model.predict(X_test)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+
+# Métricas
+print(classification_report(y_test, y_pred))
+print("ROC-AUC:", roc_auc_score(y_test, y_pred_proba))
+print("Matriz de confusión:\n", confusion_matrix(y_test, y_pred))
+
+# Curva ROC
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc_score(y_test, y_pred_proba))
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend(loc="lower right")
+plt.show()
+
+params = {'n_estimators': [50, 100], 'max_depth': [10, 20]}
+grid = GridSearchCV(model, param_grid=params, scoring='roc_auc', cv=3)
+grid.fit(X_train_smote, y_train_smote)
+
+print("Mejores parámetros:", grid.best_params_)
+print("Mejor score ROC AUC:", grid.best_score_)
+
+
+joblib.dump(model, 'modelo_credit_fraud.pkl')
