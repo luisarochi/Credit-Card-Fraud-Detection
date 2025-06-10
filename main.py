@@ -34,3 +34,7 @@ X_scaled = scaler.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled, y, test_size=0.25, random_state=42, stratify=y
 )
+
+# Paso 5: Verificar desbalanceo en el conjunto de entrenamiento
+print("Distribución antes de SMOTE:")
+print(y_train.value_counts())
